@@ -10,15 +10,15 @@ ii <- CODICI_REG[,"Denominazione.Regione"== 'Lombaridia']
 Lombardia_comuni <- comuni_italia %>% filter(COD_REG == 3)
 
 Milano = Lombardia_comuni %>% filter(COMUNE == "Milano")
-II <- which(comuni$COMUNE=='Milano')
+II <- which(Lombardia_comuni$COMUNE=='Milano')
 
 x11()
 plot(st_geometry(Milano), col = 3, border = 'grey',  axes = TRUE)
 plot(st_geometry(st_centroid(Milano)), pch = 3, col = 'red', add = TRUE)
 x11()
-plot(st_geometry(Lombardia), col = sf.colors(12, categorical = TRUE), border = 'grey', 
+plot(st_geometry(Lombardia_comuni), col = sf.colors(12, categorical = TRUE), border = 'grey', 
      axes = TRUE)
-plot(st_geometry(st_centroid(lombardia)), pch = 3, col = 'red', add = TRUE)
+plot(st_geometry(st_centroid(Lombardia_comuni)), pch = 3, col = 'red', add = TRUE)
 
 
 
@@ -31,21 +31,23 @@ x11()
 plot(st_geometry(Lombardia_province), col = sf.colors(12, categorical = TRUE), border = 'grey',  axes = TRUE)
 plot(st_geometry(st_centroid(Lombardia_province)), pch = 3, col = 'red', add = TRUE)
 x11()
-plot(st_geometry(Lombardia), col = sf.colors(12, categorical = TRUE), border = 'grey', 
+plot(st_geometry(Lombardia_province), col = sf.colors(12, categorical = TRUE), border = 'grey', 
      axes = TRUE)
-plot(st_geometry(st_centroid(lombardia)), pch = 3, col = 'red', add = TRUE)
+plot(st_geometry(st_centroid(Lombardia_province)), pch = 3, col = 'red', add = TRUE)
 
 # PROVE CON LE COORDINATE----
-st_intersects(Milano, Milano_prov)
-st_contains(Milano, Milano_prov)
+Sesto <- Lombardia_comuni%>% filter(COMUNE =='Sesto San Giovanni')
+Milano_comuni <- Lombardia_comuni%>% filter(COD_UTS ==215)
+st_intersects(Lombardia_province,Lombardia_comuni) #lista le intersezioni tra A e B
+st_contains(Lombardia_province, Milano_comuni) #Lista i comuni di B che sono contenuti in A
 
 
 x11()
 plot(st_geometry(Lombardia_province), col = sf.colors(12, categorical = TRUE), border = 'grey',  axes = TRUE)
-plot(st_geometry(Lombardia), col = sf.colors(12, categorical = TRUE), border = 'grey', 
+plot(st_geometry(Lombardia_comuni), col = sf.colors(12, categorical = TRUE), border = 'grey', 
      axes = TRUE)
 
 
 ggplot() + 
-  geom_sf(data = comuni, aes(fill = BIR74)) + 
+  geom_sf(data = Lombardia_comuni, aes(fill = 'BIR74')) + 
   scale_y_continuous(breaks = 34:36)
