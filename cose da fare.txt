@@ -1,0 +1,6 @@
+edo: trovare shape file milano e lavorare con dataset su milano
+
+elena: calcolare velocità 'istantanea' e dividere osservazioni 'a piedi/in bici' e non
+
+fra: sql 
+erica: dataset per zone milano
