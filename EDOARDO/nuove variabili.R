@@ -12,9 +12,23 @@ for (i in 1:length(j.id)){
   temp2 <- cbind(temp[1,1], temp[1,10])
   first<-rbind(first, which(data$timestamp==temp2[1] & data$journey_id==temp2[2]))
 }
-data[first,7:8] <- 0
+data[first,7] <- 0.00001
+data[first,8] <- 0
+data <- data[1:first[length(first)],]
+vel <- data[,8]/data[,7] 
+#tolgo viaggi con velocità istantanea superiore a 180 km/h
+#circa il 18% delle osservazioni sono relative a viaggi in cui si osserva almeno una volta vel > 180 km/h
+j.da.scartare <- unique(data[which(vel>50),10])
+ii <- NULL
+for (i in 1:length(j.da.scartare)) {
+  ii <- c(ii, which(data$journey_id == j.da.scartare[i]))
+}
+data <- data[-ii,]
+vel <- data[,8]/data[,7]
 
-data <- data[1:4000,] #dataset completo troppo pesante
+
+
+#data <- data[1:4000,] #dataset completo troppo pesante
 
 #calcolo quanti viaggi ci sono stati al giorno 
 range.time <- cbind(1581894000,1582498799)
@@ -39,7 +53,7 @@ for (i in 1:7){
 }
 
 #distanza percorsa al giorno per ogni persona
-dist.per.day / people.per.day #troppo alta 
+dist.per.day / people.per.day 
 
 #velocità dei viaggi (eventualmente si può fare anche caso functional: selezioniamo dei viaggi a caso (oppure gli scegliamo secondo certi criteri tipo giorno/notte ...) e calcoliamo la velocità istanzanea nei vari istanti di tempo)
 journeys <- unique(data.red$journey_id)
@@ -61,7 +75,7 @@ for (i in 1:7){
       time.per.day[i] <- time.per.day[i]/length(jour)
   }
 }
-#anche la durata media dei viaggi sembra un po' alta
+
 
 
 
