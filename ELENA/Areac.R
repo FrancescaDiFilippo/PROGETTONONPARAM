@@ -23,7 +23,16 @@ x11()
 plot(sps)
 
 # Oggetto di tipo sf:
-polygon_c <- st_as_sf(sps)
+polygon_c <- st_as_sf(sps, coords= c(ingressi_areac_varchi$LONG_X_4326, ingressi_areac_varchi$LAT_Y_4326),crs = 4326)
+polygon_c <- st_transform(polygon_c, crs=4326)
+
+
+library(rgeos)
+
+#intersects <- rgeos::gIntersects(sps, as(dati, Class = "Spatial"))
+#intersects
+#x11()
+#plot(intersects)
 
 
 
@@ -41,13 +50,28 @@ plot(polygon_c, col='blue', add=TRUE)
 
 
 
+# controllare le persone che entrano in area c
+
+
+setwd('C:/Users/Elena/Desktop/Elena/Polimi/MAGISTRALE/Nonparametric statistics/Progetto')
+
+dataset <- st_read("dataset.csv")
 
 
 
 
+dati <- st_as_sf(dataset, coords= c('latitude','longitude'),crs = 4326 )
+contains <- st_contains(dati,polygon_c )
+contains
 
+within__ <- st_within(dati, polygon_c)
+within__
 
+df <- within__ %>% lengths > 0
+dati_milan <- dati[df==1,]
 
+x11()
+ggplot() + geom_sf(data= Milano)+geom_sf(data=dati_milan, col='Red')
 
 
 
