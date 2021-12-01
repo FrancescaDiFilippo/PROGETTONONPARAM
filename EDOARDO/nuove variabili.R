@@ -31,8 +31,9 @@ data <- data[-ii,]
 vel <- data[,8]/data[,7]
 library(stringr)
 dataset <- data
-dataset$datetime_correct <-str_replace_all(dataset$datetime, "[TZ]", " ")
+data_5000$datetime_correct <-str_replace_all(data_5000$datetime, "[TZ]", " ")
 dataset$datetime_correct <-strptime(dataset$datetime_correct, format="%Y-%m-%d %H:%M:%S")
+data_5000$datetime_correct <-as.POSIXct(data_5000$datetime_correct, format="%Y-%m-%d %H:%M:%S")
 
 write.csv(dataset, 'dataset.definitivo.csv')
 
@@ -95,7 +96,22 @@ for (i in 1:7){
   }
 }
 
+#divido in fasce orarie 
+data <- read.table('C:/Users/E5440/Desktop/esami/Nonparametric statistics/Progetto/dataset.definitivo.csv',header = TRUE, sep=',')
+library(lubridate)
+data_5000 <- data[1:5000,]
+indici_mattino <- which((hour(data_5000[,12])>=6 & hour(data_5000[,12])<=9)  )
+indici_sera <- which(hour(data_5000[,12])<=20 & hour(data_5000[,12])>=17)
+viaggi_lavoro <- append(mattino,sera)
+#viaggi_lavoro <-order(viaggi_lavoro)
+indici_week <- which((day(data_5000[,12])>=17 & hour(data_5000[,12])<=21)  )
 
+indici_weekend <- which((day(data_5000[,12])>=22 & hour(data_5000[,12])<=23)  )
+data_5000$punta <- 0
+data_5000$punta[indici_mattino] <- 1
+data_5000$punta[indici_sera] <- 2
+data_5000$weekend <- 0
+data_5000$weekend[indici_weekend] <- 1
 
-
-
+library(dplyr)
+mattino<- data_5000 %>% filter((hour(data_5000[,12])>=6 & hour(data_5000[,12])<=9) )%>% group_by(cuebiq_id,journey_id)
