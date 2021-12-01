@@ -1,4 +1,4 @@
-setwd('C:/Users/E5440/Desktop/esami/Nonparametric statistics/Progetto/Github/PROGETTONONPARAM')
+setwd('C:/Users/E5440/Desktop/esami/Nonparametric statistics/Progetto')
 data <- read.table('dataset.csv', header=TRUE, sep=',')
 data <- data[,-dim(data)[2]]
 data[which(is.na(data[,7])==TRUE),7] <- 0
@@ -6,25 +6,45 @@ data[which(is.na(data[,8])==TRUE),8] <- 0
 
 #bisogna mettere a 0 i timedelta e spacedelta di tutte le prime osservazioni di ciascun journey_id
 j.id <- unique(data$journey_id) #dataset ordinato per journey ID
-first<- NULL #first è il vettore degli indici delle prime osservazioni per ciascun journey_id
-for (i in 1:length(j.id)){
-  temp <- subset(data, journey_id==j.id[i])
-  temp2 <- cbind(temp[1,1], temp[1,10])
-  first<-rbind(first, which(data$timestamp==temp2[1] & data$journey_id==temp2[2]))
-}
+j.start <- 1
+j.fin <-1
+first <- NULL
+for(i in 1:length(j.id)){
+  while(data$journey_id[j.fin] == j.id[i] & j.fin < dim(data)[1]){
+    j.fin<-j.fin+1
+  }
+  first <- c(first, j.start)
+  j.start <- j.fin
+  }
 data[first,7] <- 0.00001
 data[first,8] <- 0
-data <- data[1:first[length(first)],]
 vel <- data[,8]/data[,7] 
-#tolgo viaggi con velocità istantanea superiore a 180 km/h
-#circa il 18% delle osservazioni sono relative a viaggi in cui si osserva almeno una volta vel > 180 km/h
-j.da.scartare <- unique(data[which(vel>50),10])
+length(which(vel>200/3.6))/length(vel)
+#tolgo viaggi con velocità istantanea superiore a 200 km/h
+j.da.scartare <- unique(data[which(vel>200/3.6),10])
 ii <- NULL
 for (i in 1:length(j.da.scartare)) {
   ii <- c(ii, which(data$journey_id == j.da.scartare[i]))
 }
+length(ii)/length(vel) #circa il 17% delle osservazioni sono relative a viaggi in cui si osserva almeno una volta vel > 200 km/h
 data <- data[-ii,]
 vel <- data[,8]/data[,7]
+library(stringr)
+dataset <- data
+data_5000$datetime_correct <-str_replace_all(data_5000$datetime, "[TZ]", " ")
+dataset$datetime_correct <-strptime(dataset$datetime_correct, format="%Y-%m-%d %H:%M:%S")
+data_5000$datetime_correct <-as.POSIXct(data_5000$datetime_correct, format="%Y-%m-%d %H:%M:%S")
+
+write.csv(dataset, 'dataset.definitivo.csv')
+
+
+
+
+
+
+
+
+
 
 
 
@@ -76,7 +96,22 @@ for (i in 1:7){
   }
 }
 
+#divido in fasce orarie 
+data <- read.table('C:/Users/E5440/Desktop/esami/Nonparametric statistics/Progetto/dataset.definitivo.csv',header = TRUE, sep=',')
+library(lubridate)
+data_5000 <- data[1:5000,]
+indici_mattino <- which((hour(data_5000[,12])>=6 & hour(data_5000[,12])<=9)  )
+indici_sera <- which(hour(data_5000[,12])<=20 & hour(data_5000[,12])>=17)
+viaggi_lavoro <- append(mattino,sera)
+#viaggi_lavoro <-order(viaggi_lavoro)
+indici_week <- which((day(data_5000[,12])>=17 & hour(data_5000[,12])<=21)  )
 
+indici_weekend <- which((day(data_5000[,12])>=22 & hour(data_5000[,12])<=23)  )
+data_5000$punta <- 0
+data_5000$punta[indici_mattino] <- 1
+data_5000$punta[indici_sera] <- 2
+data_5000$weekend <- 0
+data_5000$weekend[indici_weekend] <- 1
 
-
-
+library(dplyr)
+mattino<- data_5000 %>% filter((hour(data_5000[,12])>=6 & hour(data_5000[,12])<=9) )%>% group_by(cuebiq_id,journey_id)
