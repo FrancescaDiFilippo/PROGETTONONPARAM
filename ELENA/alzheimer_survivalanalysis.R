@@ -17,7 +17,7 @@ library(broom)
 
 
 # controllo ingressi in area c
-setwd('C:/Users/Elena/Desktop/Elena/Polimi/MAGISTRALE/Nonparametric statistics/PROGETTO ALZHEIMER')
+setwd('C:/Users/Elena/Desktop/Elena/Polimi/MAGISTRALE/Nonparametric statistics/Progetto/github repository/PROGETTONONPARAM/Elena')
 dataset_xsectional <- read.csv("oasis_cross-sectional.csv", header = T)
 dataset_longitudinal <- read.csv("oasis_longitudinal.csv", header = T)
 
@@ -72,6 +72,7 @@ v <- rep(0, 227)
 
 for (i in 2:226){
   #for (j in 2:86){
+  if(dataset_surv$Group[i] != 'Converted'){
     if(dataset_surv$Subject.ID[i] == dataset_surv$Subject.ID[i-1] & dataset_surv$Subject.ID[i] != dataset_surv$Subject.ID[i+1]){
       #v[j] <- i
       v[i] <- 1
@@ -79,12 +80,31 @@ for (i in 2:226){
       #break
     }
     #break
+  }
   #}
 }
 
 #v[86] <- 227
 v[227] <- 1
 #append(w, 227)
+
+v[22] <- 1
+v[24] <- 1
+v[38] <- 1
+v[51] <- 1
+v[69] <- 1
+v[119] <- 1
+v[136] <- 1
+v[147] <- 1
+v[159] <- 1
+v[168] <- 1  # 168-169 è outlier? paziente OAS2_0131
+v[171] <- 1
+v[184] <- 1
+v[186] <- 1
+v[215] <- 1
+
+
+
 
 
 #dataset_surv %>% slice(dataset_surv, v)
@@ -100,14 +120,20 @@ dataset_surv$ID <- factor(dataset_surv$Subject.ID , labels = seq(1:86))
 #dataset_longitudinal$ID <- factor(seq(1:length(unique(dataset_longitudinal$Subject.ID))))
 dataset_surv$time_y <- dataset_surv$MR.Delay
 #dataset_longitudinal$status_fact <- ifelse(dataset_longitudinal$Group == 'Nondemented',1, 2)
-dataset_surv$status_fact <- factor(dataset_surv$Group , labels = (c('Censor','Event')))
-subs <- head(dataset_surv)
+dataset_surv$status_fact <- factor(dataset_surv$Group , labels = (c('Event', 'Censor')))
+subs <- dataset_surv[5:10,]
 
 x11()
 ggplot(data=subs,aes(x=ID,y=time_y)) + 
   geom_bar(stat='identity',width=0.2) +
   geom_point(aes(color=status_fact,shape=status_fact),size=6) +
   coord_flip()
+
+
+##################################
+
+
+
 
 
 
